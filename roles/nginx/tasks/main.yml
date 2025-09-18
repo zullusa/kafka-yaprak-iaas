@@ -24,14 +24,14 @@
   file:
     path: /etc/nginx/sites-available/
     state: directory
-    mode: 0666
+    mode: 0777
 
 - name: Create site configuration directory
   become: true
   file:
     path: /etc/nginx/sites-enabled/
     state: directory
-    mode: 0666
+    mode: 0777
 
 - name: Configure nginx virtual host
   template:
