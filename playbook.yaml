@@ -1,0 +1,14 @@
+---
+- name: Deploy common packages and configure Docker
+  hosts: all
+  roles:
+    - role: common
+      tags: [ 'common' ]
+    - role: nginx
+      tags: [ 'nginx' ]
+    - role: certbot
+      tags: [ 'certbot' ]
+    - role: heartbeat
+      tags: [ 'heartbeat' ]
+    - role: jobs
+      tags: [ 'jobs' ]
