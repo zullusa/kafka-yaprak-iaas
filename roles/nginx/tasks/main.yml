@@ -8,6 +8,7 @@
 - name: Set SELinux boolean for Nginx to allow network connections
   become: yes
   command: setsebool -P httpd_can_network_connect true
+  when: ansible_distribution == 'Fedora'
 
 
 - name: Copy nginx configuration file
