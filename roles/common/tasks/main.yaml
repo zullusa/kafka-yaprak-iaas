@@ -50,7 +50,7 @@
       args:
         executable: /bin/bash
 
-    - name: Update package repositories for Debian based systems
+    - name: Upgrade package repositories for Debian based systems
       become: true
       when: ansible_os_family == 'Debian'
       apt:
