@@ -62,6 +62,12 @@
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
       args:
         executable: /bin/bash
+    - name: Update package repositories for Debian based systems
+      become: true
+      when: ansible_os_family == 'Debian'
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
   when: ansible_distribution == "Ubuntu"
 
 - name: Install required packages
