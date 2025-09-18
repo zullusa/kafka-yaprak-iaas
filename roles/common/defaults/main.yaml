@@ -2,6 +2,7 @@ packages_to_install_common:
   - mc
   - docker-ce
   - docker-ce-cli
+  - containerd.io
   - htop
   - vim
   - python3-certbot-nginx
@@ -12,6 +13,8 @@ packages_to_install_common:
   - git
 
 packages_to_install_ubuntu:
+  - gnupg
+  - lsb-release
   - apt-transport-https
   - ca-certificates
   - curl
