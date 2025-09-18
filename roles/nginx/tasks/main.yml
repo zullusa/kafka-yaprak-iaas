@@ -33,6 +33,18 @@
     state: directory
     mode: 0777
 
+- name: Remove default site from sites-available
+  become: yes
+  file:
+    path: /etc/nginx/sites-available/default
+    state: absent
+
+- name: Remove default site from sites-enabled
+  become: yes
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
 - name: Configure nginx virtual host
   template:
     src: default.conf.j2
