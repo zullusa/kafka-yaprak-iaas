@@ -6,17 +6,6 @@
     update_cache: yes
     cache_valid_time: 3600
 
-- name: Install required packages
-  become: true
-  package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ packages_to_install_common }}"
-  register: result
-  until: result is succeeded
-  retries: 1
-  delay: 5
-
 - name: Install required packages (Fedora)
   become: true
   when: ansible_distribution == 'Fedora'
@@ -36,6 +25,51 @@
     name: "{{ item }}"
     state: present
   loop: "{{ packages_to_install_ubuntu }}"
+  register: result
+  until: result is succeeded
+  retries: 1
+  delay: 5
+
+- name: Add Docker repo (Ubuntu only)
+  block:
+    - name: Create /etc/apt/keyrings directory
+      become: true
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker GPG key
+      become: true
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+        force: no
+
+    - name: Ensure Docker GPG key is readable by all
+      become: true
+      file:
+        path: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+
+    - name: Add Docker APT repository (Ubuntu only)
+      become: true
+      shell: |
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          \$(. /etc/os-release && echo \"\$VERSION_CODENAME\") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      args:
+        executable: /bin/bash
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install required packages
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages_to_install_common }}"
   register: result
   until: result is succeeded
   retries: 1

@@ -2,7 +2,6 @@ packages_to_install_common:
   - mc
   - docker-ce
   - docker-ce-cli
-  - containerd.io
   - htop
   - vim
   - python3-certbot-nginx
@@ -13,8 +12,13 @@ packages_to_install_common:
   - git
 
 packages_to_install_ubuntu:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
   - cron
 
 packages_to_install_fedora:
+  - containerd.io
   - python3-libdnf5
   - cronie

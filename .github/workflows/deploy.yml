@@ -1,4 +1,7 @@
+env:
+  SITE_NAME: yaprak-vm
 name: Yaprak Deployment
+run-name: ${{ github.actor }}
 on:
   push:
     branches: [ "main" ]
@@ -18,3 +21,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           inventory: ${{ secrets.ANSIBLE_INVENTORY }}
           vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+      - name: Telegram bot Notify
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ${{ env.SITE_NAME }} was deployed
