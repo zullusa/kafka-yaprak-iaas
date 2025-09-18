@@ -1,0 +1,65 @@
+---
+- name: Ensure nginx is installed
+  become: true
+  package:
+    name: nginx
+    state: present
+
+- name: Set SELinux boolean for Nginx to allow network connections
+  become: yes
+  command: setsebool -P httpd_can_network_connect true
+
+
+- name: Copy nginx configuration file
+  become: true
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+  notify: restart nginx
+
+- name: Create site configuration directory
+  become: true
+  file:
+    path: /etc/nginx/sites-available/
+    state: directory
+    mode: 0666
+
+- name: Create site configuration directory
+  become: true
+  file:
+    path: /etc/nginx/sites-enabled/
+    state: directory
+    mode: 0666
+
+- name: Configure nginx virtual host
+  template:
+    src: default.conf.j2
+    dest: /etc/nginx/sites-available/default.conf
+    mode: 0644
+
+- name: Create symbolic link for default configuration
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/default.conf
+    dest: /etc/nginx/sites-enabled/default.conf
+    state: link
+
+- name: Configure nginx virtual host {{ domain_name }}
+  template:
+    src: domain_name.conf.j2
+    dest: /etc/nginx/sites-available/{{ domain_name }}.conf
+    mode: 0644
+
+- name: Create symbolic link for {{ domain_name }} configuration
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/{{ domain_name }}.conf
+    dest: /etc/nginx/sites-enabled/{{ domain_name }}.conf
+    state: link
+  notify: restart nginx
+
+- name: Start and enable nginx service
+  become: true
+  service:
+    name: nginx
+    state: started
+    enabled: yes

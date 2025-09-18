@@ -1,0 +1,27 @@
+---
+- name: Ensure certbot is installed
+  become: true
+  package:
+    name: certbot
+    state: present
+
+- name: Generate Let's Encrypt certificate
+  become: true
+  command: >
+    certbot run
+    --nginx
+    -n
+    --agree-tos
+    -m {{ email }}
+    -d {{ domain_name }}
+  register: certbot_result
+  changed_when: "'Congratulations!' in certbot_result.stdout"
+  notify: reload nginx
+
+- name: Ensure certbot cron job exists to renew certificates automatically
+  become: true
+  cron:
+    name: "Renew Let's Encrypt certificates"
+    minute: "0"
+    hour: "2"
+    job: "/usr/bin/certbot renew --quiet"

@@ -8,7 +8,3 @@
       tags: [ 'nginx' ]
     - role: certbot
       tags: [ 'certbot' ]
-    - role: heartbeat
-      tags: [ 'heartbeat' ]
-    - role: jobs
-      tags: [ 'jobs' ]

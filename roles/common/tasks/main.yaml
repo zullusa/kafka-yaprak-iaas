@@ -1,0 +1,74 @@
+---
+- name: Update package repositories for Debian based systems
+  become: true
+  when: ansible_os_family == 'Debian'
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install required packages
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages_to_install_common }}"
+  register: result
+  until: result is succeeded
+  retries: 1
+  delay: 5
+
+- name: Install required packages (Fedora)
+  become: true
+  when: ansible_distribution == 'Fedora'
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages_to_install_fedora }}"
+  register: result
+  until: result is succeeded
+  retries: 1
+  delay: 5
+
+- name: Install required packages (Ubuntu)
+  become: true
+  when: ansible_distribution == 'Ubuntu'
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ packages_to_install_ubuntu }}"
+  register: result
+  until: result is succeeded
+  retries: 1
+  delay: 5
+
+- name: Enable Docker service
+  become: true
+  when: "'docker-ce' in packages_to_install_common"
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Install cron (Ubuntu)
+  become: true
+  when: ansible_distribution == 'Ubuntu'
+  apt:
+    name: cron
+    state: present
+    update_cache: true
+
+- name: Add current user to Docker group (Ubuntu)
+  become: true
+  when: ansible_distribution == 'Ubuntu'
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
+
+- name: Add current user to Docker group (Fedora)
+  become: true
+  when: ansible_distribution == 'Fedora'
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: wheel
+    append: yes
