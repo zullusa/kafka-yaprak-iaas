@@ -101,3 +101,10 @@
     name: "{{ ansible_user_id }}"
     groups: wheel
     append: yes
+
+- name: Set permissions 777 for /opt directory
+  become: yes
+  file:
+    path: /opt
+    mode: '0777'
+    state: directory
